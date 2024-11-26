@@ -49,6 +49,6 @@ class database:
         conn.execute(query, (id, FNAME, LNAME, Type, email, phone_number, password))
         conn.commit()
         conn.close()
-
+        #ds
 
 

@@ -13,7 +13,7 @@ class user:
         self.password = hashlib.sha256(password.encode()).hexdigest()
         DB = database()
         DB.insertUser(self.ID , self.Fname , self.Lname , self.Type , self.email , self.phone_number , self.password )
-        
+        # dd
 
         
      

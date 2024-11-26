@@ -248,8 +248,110 @@ def log_in():
     # Run the Tkinter event loop
     root.mainloop()
 
+<<<<<<< HEAD
 # Call the login function to start the application
 log_in()
 
 
 
+=======
+def input_valid(Fname ,Lname , Type , password, email ,  number,  id  ):
+        valid_phone_number = re.search("^(05)" ,number)
+        valid_ID = len(id) == 10
+        valid_pass = len(password) >= 6
+        valid_email = re.search("(@ksu.edu.sa)$", email)
+        if not valid_phone_number:
+             # error on GUI
+             pass
+        if not valid_ID:
+             pass
+        if not valid_pass:
+             pass
+        if not valid_email:
+             pass
+        mohammed = User(id , Fname , Lname , Type, email , number , password)
+
+def admin():
+    def create_logistics_office():
+        office_id = entry_office_id.get()
+        office_name = entry_office_name.get()
+
+        if not office_id or not office_name:
+            messagebox.showwarning("Incomplete Data", "Please fill in all fields!")
+        else:
+            central_database.append({"Office ID": office_id, "Office Name": office_name})
+            messagebox.showinfo("Success", "Logistics office added successfully!")
+
+    def logout():
+        admin_root.destroy()
+        sign_up()
+
+    def backup_database():
+        if not central_database:
+            messagebox.showwarning("No Data", "No data to backup!")
+            return
+
+        try:
+            with open("database_backup.csv", "w", newline="") as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=["Office ID", "Office Name"])
+                writer.writeheader()
+                writer.writerows(central_database)
+            messagebox.showinfo("Success", "Backup completed successfully!")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to backup data: {str(e)}")
+
+    # Create admin application window
+    admin_root = tk.Tk()
+    admin_root.title("Admin Page")
+    admin_root.geometry("700x500")
+    admin_root.configure(bg="#37474f")
+
+    # Center window on screen
+    window_width = 700
+    window_height = 500
+    screen_width = admin_root.winfo_screenwidth()
+    screen_height = admin_root.winfo_screenheight()
+    position_top = int(screen_height / 2 - window_height / 2)
+    position_left = int(screen_width / 2 - window_width / 2)
+    admin_root.geometry(f'{window_width}x{window_height}+{position_left}+{position_top}')
+
+    # Frame for form fields
+    frame = tk.Frame(admin_root, bg="#263238", padx=20, pady=20, relief=tk.GROOVE, borderwidth=3)
+    frame.place(relx=0.5, rely=0.5, anchor="center")
+
+    # Form Title
+    title_label = tk.Label(admin_root, text="Admin Panel", font=("Arial", 20, "bold"), bg="#37474f", fg="#64b5f6")
+    title_label.place(relx=0.5, rely=0.1, anchor="center")
+
+    # Logistics Office ID
+    tk.Label(frame, text="Office ID:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=0, column=0, sticky="w", pady=10, padx=10)
+    entry_office_id = tk.Entry(frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
+    entry_office_id.grid(row=0, column=1, pady=10, padx=10)
+
+    # Logistics Office Name
+    tk.Label(frame, text="Office Name:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=1, column=0, sticky="w", pady=10, padx=10)
+    entry_office_name = tk.Entry(frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
+    entry_office_name.grid(row=1, column=1, pady=10, padx=10)
+
+    # Buttons
+    button_frame = tk.Frame(admin_root, bg="#37474f")
+    button_frame.place(relx=0.5, rely=0.85, anchor="center")
+
+    create_button = tk.Button(button_frame, text="Create", font=("Arial", 12, "bold"), bg="#43a047", fg="white", command=create_logistics_office)
+    create_button.grid(row=0, column=0, padx=10, ipadx=20, ipady=5)
+
+    logout_button = tk.Button(button_frame, text="Logout", font=("Arial", 12, "bold"), bg="#0288d1", fg="white", command=logout)
+    logout_button.grid(row=0, column=1, padx=10, ipadx=20, ipady=5)
+
+    backup_button = tk.Button(button_frame, text="Backup", font=("Arial", 12, "bold"), bg="#ffa000", fg="white", command=backup_database)
+    backup_button.grid(row=0, column=2, padx=10, ipadx=20, ipady=5)
+
+    # Run the Tkinter event loop
+    admin_root.mainloop()
+
+# Run the admin function for testing purposes
+admin()    
+    
+
+log_in()    
+>>>>>>> 57eaeb70f422733608cee428d63c29b6ac0adf41
