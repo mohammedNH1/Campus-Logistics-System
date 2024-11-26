@@ -234,5 +234,19 @@ def log_in():
     # Run the Tkinter event loop
     root.mainloop()
 
-sign_up()
-    
+def input_valid(Fname ,Lname , Type , password, email ,  number,  id  ):
+        valid_phone_number = re.search("^(05)" ,number)
+        valid_ID = len(id) == 10
+        valid_pass = len(password) >= 6
+        valid_email = re.search("(@ksu.edu.sa)$", email)
+        if not valid_phone_number:
+             # error on GUI
+             pass
+        if not valid_ID:
+             pass
+        if not valid_pass:
+             pass
+        if not valid_email:
+             pass
+        mohammed = User(id , Fname , Lname , Type, email , number , password)
+log_in()    
