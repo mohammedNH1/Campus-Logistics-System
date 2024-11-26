@@ -1,19 +1,19 @@
 import sqlite3
 
-class DataBase:
+class database:
     def __init__(self):
-        pass
+        self.conn = sqlite3.connect('dataBase.db')
+        self.cursor = self.conn.cursor()
 
     def initiate_database(self):
         conn = sqlite3.connect('dataBase.db')
-
         conn.execute('''CREATE TABLE USER
         (ID INT PRIMARY KEY NOT NULL,
         F_NAME TEXT NOT NULL,
         L_NAME TEXT NOT NULL,
         TYPE TEXT NOT NULL,
         EMAIL TEXT NOT NULL,                 
-        PHONE_NUMBER INT NOT NULL,
+        PHONE_NUMBER TEXT NOT NULL,
         PASSWORD TEXT NOT NULL);''')
         print("USER Table created successfully")
 
@@ -38,6 +38,17 @@ class DataBase:
         print("PACKAGE Table created successfully")
 
         conn.close()
+    def insertUser(self , id , FNAME , LNAME , Type , email , phone_number , password):
+        conn = sqlite3.connect('dataBase.db')
+        
+        # Use a parameterized query to avoid SQL injection and errors with string values
+        query = '''INSERT INTO USER (ID, F_NAME, L_NAME, TYPE, EMAIL, PHONE_NUMBER, PASSWORD)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)'''
+        
+        # Execute the query with parameters passed as a tuple
+        conn.execute(query, (id, FNAME, LNAME, Type, email, phone_number, password))
+        conn.commit()
+        conn.close()
 
-db = DataBase()
-db.initiate_database()
+
+

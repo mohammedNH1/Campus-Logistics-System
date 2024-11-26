@@ -1,34 +1,27 @@
 import re
-class User:
-    def __init__(self, ID , Fname , Lname , type, email , phone_number , password ):
+from DataBase import database
+import hashlib
+class user:
+    
+    def __init__(self, ID , Fname , Lname , Type, email , phone_number , password ):
         self.ID = ID
         self.Fname = Fname
         self.Lname = Lname
-        self.type = type
+        self.Type = Type
         self.email = email
         self.phone_number = phone_number
-        self.password = password
+        self.password = hashlib.sha256(password.encode()).hexdigest()
+        DB = database()
+        DB.insertUser(self.ID , self.Fname , self.Lname , self.Type , self.email , self.phone_number , self.password )
+        
+
         
      
 
 
         
-#mohammed = User(1, 1 , 1, 1, 1 ,"0500" , 1)
-def input_valid(Fname ,Lname , Type , password, email ,  number,  id  ):
-        valid_phone_number = re.search("^(05)" ,number)
-        valid_ID = len(id) == 10
-        valid_pass = len(password) >= 6
-        valid_email = re.search("(@ksu.edu.sa)$", email)
-        if not valid_phone_number:
-             # error on GUI
-             pass
-        if not valid_ID:
-             pass
-        if not valid_pass:
-             pass
-        if not valid_email:
-             pass
-        mohammed = User(id , Fname , Lname , Type, email , number , password)
+#mohammed = User("44410", "Mohammed" , "alhassan", "Student", "mohammedcom" , 324023140 , "123456")
+
 
 
         
