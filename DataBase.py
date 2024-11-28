@@ -47,8 +47,8 @@ class database:
         conn.close()
         
     def retrieveUser(self, id, password):
-        mySet = {"User","Student", "Employee", "Faculty"}
-
+        mySet = {"Student","Faculty"}
+        
         cursor = self.conn.execute("SELECT ID, TYPE, PASSWORD from USER")  
 
         for row in cursor:
@@ -86,7 +86,16 @@ class database:
             print("insert package worked")
             conn.commit()
             conn.close()
+    def retrieveOffices(self):
+        cursor = self.conn.execute("SELECT ID , NAME  from OFFICE")  
+        diction = {}
+        for row in cursor:
+            diction[row[1]] = row[0]
         
+        self.conn.close() 
+        return diction
+    
+
 
     # ID TEXT PRIMARY KEY NOT NULL,
     #     OFFICE_ID TEXT NOT NULL,
@@ -95,6 +104,6 @@ class database:
     #     DIMENSIONS TEXT NOT NULL,
     #     WEIGHT REAL NOT NULL,
 
-# mohammed = database()
-# mohammed.initiate_database()
+#mohammed = database()
+#mohammed.initiate_database()
 

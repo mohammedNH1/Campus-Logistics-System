@@ -87,7 +87,7 @@ def sign_up():
 
     # Type (Toggle buttons placed next to each other)
     tk.Label(frame, text="Type:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=3, column=0, sticky="w", pady=10, padx=10)
-    user_type_var = tk.StringVar(value="User")  # Default to "User"
+    user_type_var = tk.StringVar(value="Student")  # Default to "User"
 
     # Create a frame to hold the toggle switches
     toggle_frame = tk.Frame(frame, bg="#263238")
@@ -133,7 +133,7 @@ def sign_up():
         type = user_type_var.get()
 
         valid_phone_number = re.search("^(05)" ,number)
-        if type == 'User':
+        if type == 'Student':
             valid_ID = len(id) == 10
         else:
             valid_ID = len(id) == 6        
@@ -416,6 +416,7 @@ def generate_tracking_number():
 # User Window
 def user_window():
     def add_package():
+        DB = database()  
         tracking_number = ""
         for i in range(16):
             tracking_number += str(random.randint(0,9))
@@ -423,10 +424,11 @@ def user_window():
         dimenstion = entry_length.get()+"X"+entry_width.get()+"X"+entry_height.get()
         print(dimenstion)
         weight = entry_weight.get()
-        office_id = logistics_office_var.get()
+        office_name = logistics_office_var.get()
         receiver_id = entry_receiver_user_id.get()
-        DB = database()       
-        DB.insertPackage(tracking_number , office_id , receiver_id ,  user_id , dimenstion , weight )
+        dictionOffice = DB.retrieveOffices()    
+
+        DB.insertPackage(tracking_number , dictionOffice[office_name] , receiver_id ,  user_id , dimenstion , weight )
         print('insert package worked------------------------')
         
     def logout():
@@ -477,9 +479,17 @@ def user_window():
     drop_package_frame = tk.Frame(notebook, bg="#263238")
     notebook.add(drop_package_frame, text="Drop a Package")
 
-    logistics_offices = ["Logistics Office A", "Logistics Office B", "Logistics Office C" , "DDD"]
+    DB = database()
+    flag = False  
+    logistics_offices = list(DB.retrieveOffices().keys()) # { NAME -> ID }
+
     logistics_office_var = tk.StringVar()
-    logistics_office_var.set(logistics_offices[0])  # Default selection
+    if not logistics_offices:
+        logistics_offices = ["no offices"]
+        flag = True
+    logistics_office_var.set(logistics_offices[0])    
+
+            # Default selection
 
     # Logistics Office Dropdown
     tk.Label(drop_package_frame, text="Select Logistics Office:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=0, column=0, sticky="w", pady=10, padx=10)
