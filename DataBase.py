@@ -29,6 +29,7 @@ class database:
         SENDER_ID TEXT NOT NULL,                 
         DIMENSIONS TEXT NOT NULL,
         WEIGHT REAL NOT NULL,
+        STATUS TEXT NOT NULL, 
         FOREIGN KEY (OFFICE_ID) REFERENCES OFFICE(ID) ON DELETE CASCADE,
         FOREIGN KEY (RECEIVER_ID) REFERENCES USER(ID) ON DELETE CASCADE,
         FOREIGN KEY (SENDER_ID) REFERENCES USER(ID) ON DELETE CASCADE
@@ -75,14 +76,14 @@ class database:
         except:
             print("office already exist")   
 
-    def insertPackage(self , tracking_number , office_id , receiver_id , sender_id , dimensions , weight):
+    def insertPackage(self , tracking_number , office_id , receiver_id , sender_id , dimensions , weight , status):
       
             conn = sqlite3.connect('dataBase.db')
             
-            query = '''INSERT INTO PACKAGE (TRACKING_NUMBER, OFFICE_ID ,RECEIVER_ID , SENDER_ID ,DIMENSIONS, WEIGHT )
-                    VALUES (?, ?, ? , ? , ?, ? )'''
+            query = '''INSERT INTO PACKAGE (TRACKING_NUMBER, OFFICE_ID ,RECEIVER_ID , SENDER_ID ,DIMENSIONS, WEIGHT , STATUS )
+                    VALUES (?, ?, ? , ? , ?, ?, ? )'''
             
-            conn.execute(query, (tracking_number, office_id , receiver_id , sender_id , dimensions , weight))
+            conn.execute(query, (tracking_number, office_id , receiver_id , sender_id , dimensions , weight , status ))
             print("insert package worked")
             conn.commit()
             conn.close()
@@ -95,15 +96,37 @@ class database:
         self.conn.close() 
         return diction
     
+    def retrievePackages(self):
+        
+        cursor = self.conn.execute("SELECT TRACKING_NUMBER , OFFICE_ID, RECEIVER_ID, SENDER_ID , DIMENSIONS , WEIGHT , STATUS from PACKAGE")  
+        main_list = []
+        
+        for row in cursor:
+            current_list = []
+            current_list.append(row[0])
+            current_list.append(row[1])
+            current_list.append(row[2])
+            current_list.append(row[3])
+            current_list.append(row[4])
+            current_list.append(row[5])
+            current_list.append(row[6])
+            main_list.append(current_list)
+        
+        self.conn.close() 
+        print(main_list)
+        return main_list 
+      
+#         TRACKING_NUMBER TEXT PRIMARY KEY NOT NULL,
+#         OFFICE_ID TEXT NOT NULL,
+#         RECEIVER_ID TEXT NOT NULL,
+#         SENDER_ID TEXT NOT NULL,                 
+#         DIMENSIONS TEXT NOT NULL,
+#         WEIGHT REAL NOT NULL,
+#         STATUS TEXT NOT NULL,
 
 
-    # ID TEXT PRIMARY KEY NOT NULL,
-    #     OFFICE_ID TEXT NOT NULL,
-    #     RECEIVER_ID TEXT NOT NULL,
-    #     SENDER_ID TEXT NOT NULL,              
-    #     DIMENSIONS TEXT NOT NULL,
-    #     WEIGHT REAL NOT NULL,
+ 
 
 #mohammed = database()
-#mohammed.initiate_database()
+##mohammed.initiate_database()
 

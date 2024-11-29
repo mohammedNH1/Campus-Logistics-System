@@ -8,22 +8,7 @@ import hashlib
 user_id = ""
 # Submit button action
 def sign_up():
-    
-    def submit():
-        first_name = entry_first_name.get()
-        last_name = entry_last_name.get()
-        user_id = entry_id.get()
-        user_type = user_type_var.get()
-        password = entry_password.get()
-        email = entry_email.get()
-        phone_number = entry_phone_number.get()
-
-        if not all([first_name, last_name, user_id, user_type, password, email, phone_number]):
-            messagebox.showwarning("Incomplete Data", "Please fill in all fields!")
-        else:
-            messagebox.showinfo("Success", "Form Submitted Successfully!")
-
-    # Login button action
+     # Login button action
     def login():
         messagebox.showinfo("Login", "Redirecting to login page...")
 
@@ -134,10 +119,13 @@ def sign_up():
 
         valid_phone_number = re.search("^(05)" ,number)
         if type == 'Student':
-            valid_ID = len(id) == 10
+            valid_ID = len(id) == 2
+            #valid_ID = len(id) == 10
         else:
-            valid_ID = len(id) == 6        
-        valid_pass = len(password) >= 6
+            valid_ID = len(id) == 2
+            #valid_ID = len(id) == 6        
+        # valid_pass = len(password) >= 6
+        valid_pass = len(password) == 2
         valid_email = re.search("(@ksu.edu.sa)$", email)
         if not valid_phone_number:
              print("invalid phone number 05")
@@ -150,6 +138,8 @@ def sign_up():
         else:
             print("insert worked")
             myUser = user(id , Fname , Lname , type, email , number , password)
+            root.destroy()
+            user_window() # if
     button_frame = tk.Frame(root, bg="#37474f")
     button_frame.place(relx=0.5, rely=0.85, anchor="center")  # Adjusted position slightly
     submit_button = tk.Button(button_frame, text="Submit", font=("Arial", 12, "bold"), bg="#43a047", fg="white", command=input_valid)
@@ -428,7 +418,7 @@ def user_window():
         receiver_id = entry_receiver_user_id.get()
         dictionOffice = DB.retrieveOffices()    
 
-        DB.insertPackage(tracking_number , dictionOffice[office_name] , receiver_id ,  user_id , dimenstion , weight )
+        DB.insertPackage(tracking_number , dictionOffice[office_name] , receiver_id ,  user_id , dimenstion , weight , "pending")
         print('insert package worked------------------------')
         
     def logout():
@@ -450,11 +440,26 @@ def user_window():
             messagebox.showinfo("Success", f"Package Dropped! Tracking Number: {tracking_number}")
 
     def view_packages():
-        user_packages = retrieve_user_packages(user_id="User123")
-        package_list.delete(0, tk.END)  # Clear existing list
-
-        for package in user_packages:
-            package_list.insert(tk.END, f"Tracking Number: {package['tracking_number']}, Status: {package['status']}, Location: {package['location']}")
+        DB = database()
+        user_packages = DB.retrievePackages()
+        global user_id
+        print(f"global user id{user_id}")
+        main_lst = [] # TN , OfficeID , senderID , dimension , weight , status
+        for i in user_packages:
+            if user_id == user_packages[2]:
+                current_list = []
+                current_list.append(i[0])
+                current_list.append(i[1])
+                current_list.append(i[3])
+                current_list.append(i[4])
+                current_list.append(i[5])
+                current_list.append(i[6])
+                main_lst.append(current_list)
+                
+         # Clear existing list
+        print(main_lst)
+        for package in main_lst:
+            package_list.insert(tk.END, f"Traking Number: {package[0]} , Office ID: {package[1]} , Sender ID: {package[3]} , dimensions: {package[4]} , Weight: {package[5]}KG , Status: {package[6]} ")
 
     # Create main application window
     root = tk.Tk()
@@ -550,9 +555,27 @@ def user_window():
     logout_button = tk.Button(view_packages_frame, text="Logout", font=("Arial", 12, "bold"), bg="#d32f2f", fg="white", command=logout)
     logout_button.grid(row=2, column=0, pady=10)
     
+    # Tab 3 - View sending Packages
+    view_sending_packages_frame = tk.Frame(notebook, bg="#263238")
+    notebook.add(view_sending_packages_frame, text="View sending Packages")
 
+    # View Packages Button
+    view_button = tk.Button(view_sending_packages_frame, text="Show sending Packages", font=("Arial", 12, "bold"), bg="#43a047", fg="white", command=view_packages)
+    view_button.grid(row=0, column=0, pady=20)
+
+    # Package Listbox with no white frame
+    package_sending_list = tk.Listbox(view_sending_packages_frame, font=("Arial", 12), bg="#37474f", fg="#ffffff", width=60, height=15, bd=0)
+    package_sending_list.grid(row=1, column=0, pady=10)
+
+    # Logout Button for View Packages Tab
+    logout_button = tk.Button(view_sending_packages_frame, text="Logout", font=("Arial", 12, "bold"), bg="#d32f2f", fg="white", command=logout)
+    logout_button.grid(row=2, column=0, pady=10)
+    
+
+ 
     # Run the Tkinter event loop
-    root.mainloop()
+    root.mainloop() # main
+    
 
 # To start the user window, you would typically call user_window()
 #log_in()
