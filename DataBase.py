@@ -1,4 +1,5 @@
 import sqlite3
+import csv
 class database:
     def __init__(self):
         self.conn = sqlite3.connect('dataBase.db')
@@ -113,20 +114,44 @@ class database:
             main_list.append(current_list)
         
         self.conn.close() 
-        print(main_list)
+        
         return main_list 
-      
-#         TRACKING_NUMBER TEXT PRIMARY KEY NOT NULL,
-#         OFFICE_ID TEXT NOT NULL,
-#         RECEIVER_ID TEXT NOT NULL,
-#         SENDER_ID TEXT NOT NULL,                 
-#         DIMENSIONS TEXT NOT NULL,
-#         WEIGHT REAL NOT NULL,
-#         STATUS TEXT NOT NULL,
+    def update_status(self, status ,tracking_number ):
+        try:
+            print("I am here")
+            # Use parameterized queries to prevent SQL injection
+           
+            self.conn.execute("UPDATE PACKAGE SET STATUS = ? WHERE TRACKING_NUMBER = ?", (status , tracking_number))
+            self.conn.commit()
+        except Exception as e:
+            print(f"Error updating status: {e}")
+        # Do not close the connection here if it's used elsewhere in the program.
+    
+    def backup(self):
+        file = open("backup.csv" , "w" , newline="")
+        writer = csv.writer(file)
+        cursor = self.conn.execute("SELECT * from USER")  
+
+        writer.writerow(["ID", "First Name", "Last Name", "Type", "Email", "Phone Number", "Password"] )
+        for i in cursor:
+            writer.writerow(i)
+
+        cursor = self.conn.execute("SELECT * from OFFICE")
+        writer.writerow(["ID","Name"])    
+        for i in cursor:
+            writer.writerow(i)
+
+        cursor = self.conn.execute("SELECT * from PACKAGE")
+        writer.writerow(["Tracking Number","Office ID" , "Receiver ID" , "Sender ID" , "Weight" , "Status"]) 
+        for i in cursor:
+            writer.writerow(i)
+
+
+
 
 
  
 
-#mohammed = database()
+mohammed = database()
 ##mohammed.initiate_database()
-
+mohammed.backup()

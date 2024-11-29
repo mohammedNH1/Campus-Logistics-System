@@ -9,9 +9,7 @@ user_id = ""
 # Submit button action
 def sign_up():
      # Login button action
-    def login():
-        messagebox.showinfo("Login", "Redirecting to login page...")
-
+   
     # Toggle switch style update
     def toggle_switch():
         selected = user_type_var.get()
@@ -404,6 +402,11 @@ def generate_tracking_number():
     return ''.join([str(random.randint(0, 9)) for _ in range(16)])
 
 # User Window
+import logging
+logging.basicConfig(filename='transaction.log',
+filemode='a',
+format='%(asctime)s - %(levelname)s - %(message)s',
+level=logging.DEBUG)
 def user_window():
     def add_package():
         DB = database()  
@@ -411,15 +414,14 @@ def user_window():
         for i in range(16):
             tracking_number += str(random.randint(0,9))
             
-        dimenstion = entry_length.get()+"X"+entry_width.get()+"X"+entry_height.get()
-        print(dimenstion)
+        dimension = entry_length.get()+"X"+entry_width.get()+"X"+entry_height.get()
         weight = entry_weight.get()
         office_name = logistics_office_var.get()
         receiver_id = entry_receiver_user_id.get()
         dictionOffice = DB.retrieveOffices()    
 
-        DB.insertPackage(tracking_number , dictionOffice[office_name] , receiver_id ,  user_id , dimenstion , weight , "pending")
-        print('insert package worked------------------------')
+        DB.insertPackage(tracking_number , dictionOffice[office_name] , receiver_id ,  user_id , dimension , weight , "pending")
+        logging.info(f"package added: tracking number: {tracking_number} , office ID: {dictionOffice[office_name]} , office name: {office_name} ,sender ID: {user_id} , receiver ID: {receiver_id} , dimension: {dimension} , Weight: {weight} , Status: pending")
         
     def logout():
         root.destroy()
@@ -441,12 +443,12 @@ def user_window():
 
     def view_packages():
         DB = database()
+        package_list.delete( 0 , tk.END )
         user_packages = DB.retrievePackages()
         global user_id
-        print(f"global user id{user_id}")
         main_lst = [] # TN , OfficeID , senderID , dimension , weight , status
         for i in user_packages:
-            if user_id == user_packages[2]:
+            if user_id == i[2]:
                 current_list = []
                 current_list.append(i[0])
                 current_list.append(i[1])
@@ -457,9 +459,32 @@ def user_window():
                 main_lst.append(current_list)
                 
          # Clear existing list
-        print(main_lst)
+        
         for package in main_lst:
-            package_list.insert(tk.END, f"Traking Number: {package[0]} , Office ID: {package[1]} , Sender ID: {package[3]} , dimensions: {package[4]} , Weight: {package[5]}KG , Status: {package[6]} ")
+            package_list.insert(tk.END, f"Traking Number: {package[0]} , Office ID: {package[1]} , Sender ID: {package[2]} , dimensions: {package[3]} , Weight: {package[4]}KG , Status: {package[5]} ")
+    
+    def view_sending_packages():
+        DB = database()
+        package_sending_list.delete( 0 , tk.END )
+        user_packages = DB.retrievePackages()
+        global user_id
+        main_lst = [] # TN , OfficeID , senderID , dimension , weight , status
+        for i in user_packages:
+            if user_id == i[3]:
+                current_list = []
+                current_list.append(i[0])
+                current_list.append(i[1])
+                current_list.append(i[2])
+                current_list.append(i[4])
+                current_list.append(i[5])
+                current_list.append(i[6])
+                main_lst.append(current_list)
+                
+         # Clear existing list
+        
+        for package in main_lst:
+            package_sending_list.insert(tk.END, f"Traking Number: {package[0]} , Office ID: {package[1]} , Recievier: {package[2]} , dimensions: {package[3]} , Weight: {package[4]}KG , Status: {package[5]} ")
+
 
     # Create main application window
     root = tk.Tk()
@@ -560,7 +585,7 @@ def user_window():
     notebook.add(view_sending_packages_frame, text="View sending Packages")
 
     # View Packages Button
-    view_button = tk.Button(view_sending_packages_frame, text="Show sending Packages", font=("Arial", 12, "bold"), bg="#43a047", fg="white", command=view_packages)
+    view_button = tk.Button(view_sending_packages_frame, text="Show sending Packages", font=("Arial", 12, "bold"), bg="#43a047", fg="white", command=view_sending_packages)
     view_button.grid(row=0, column=0, pady=20)
 
     # Package Listbox with no white frame
@@ -570,15 +595,153 @@ def user_window():
     # Logout Button for View Packages Tab
     logout_button = tk.Button(view_sending_packages_frame, text="Logout", font=("Arial", 12, "bold"), bg="#d32f2f", fg="white", command=logout)
     logout_button.grid(row=2, column=0, pady=10)
-    
 
  
     # Run the Tkinter event loop
     root.mainloop() # main
     
 
-# To start the user window, you would typically call user_window()
-#log_in()
+
+def courier_window():
+
+    def accept():
+        sender = entry_sender_user_id.get()
+        tracking_number = entry_tracking_number.get()  # 0 , 3
+        DB = database()
+        packages = DB.retrievePackages()
+        for i in packages:
+            if i[0] == tracking_number and i[3] == sender and i[6] == "pending":
+                DB = database()
+                DB.update_status("Accepted" , tracking_number)
+                break
+        print("Error")   
+
+    def deliver():
+        sender = entry_deliver_sender_user_id.get()
+        tracking_number = entry_deliver_tracking_number.get()
+        DB = database()
+        packages = DB.retrievePackages()
+        for i in packages:
+            if i[0] == tracking_number and i[3] == sender and i[6] == "Accepted":
+                DB = database()
+                DB.update_status("Delivered" , tracking_number)
+                break
+        print("Error")   
+
+    def accept_package():
+        DB = database()
+        sender_user_id = entry_sender_user_id.get()
+        tracking_number = entry_tracking_number.get()
+
+        # Check if both fields are filled
+        if not sender_user_id or not tracking_number:
+            messagebox.showwarning("Incomplete Data", "Please fill in all fields!")
+            return
+        
+        # Simulate the acceptance of the package into the logistics system
+        if DB.acceptPackage(sender_user_id, tracking_number):
+            messagebox.showinfo("Success", f"Package {tracking_number} accepted!")
+        else:
+            messagebox.showerror("Error", "Failed to accept the package. Please check the information.")
+
+    def deliver_package():
+        DB = database()
+        sender_user_id = entry_sender_user_id.get()
+        tracking_number = entry_tracking_number.get()
+
+        # Check if both fields are filled
+        if not sender_user_id or not tracking_number:
+            messagebox.showwarning("Incomplete Data", "Please fill in all fields!")
+            return
+        
+        # Simulate the delivery of the package
+        if DB.deliverPackage(sender_user_id, tracking_number):
+            messagebox.showinfo("Success", f"Package {tracking_number} delivered!")
+        else:
+            messagebox.showerror("Error", "Failed to deliver the package. Please check the information.")
+
+    def logout():
+        root.destroy()
+        sign_up()  # Assuming sign_up() brings back the sign up window
+
+    # Create main application window
+    root = tk.Tk()
+    root.title("Courier Window")
+    root.geometry("800x800")  # Slightly smaller window size
+    root.configure(bg="#37474f")
+
+    # Center window on screen
+    window_width = 800
+    window_height = 800
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    position_top = int(screen_height / 2 - window_height / 2)
+    position_left = int(screen_width / 2 - window_width / 2)
+    root.geometry(f'{window_width}x{window_height}+{position_left}+{position_top}')
+
+    # Create notebook (tabbed interface)
+    notebook = ttk.Notebook(root)
+    notebook.pack(pady=40)  # Add extra padding to move the entire notebook a bit down
+
+    # Tab 1 - Accept a Package
+    accept_package_frame = tk.Frame(notebook, bg="#263238")
+    notebook.add(accept_package_frame, text="Accept a Package")
+
+    # Title for the tab
+    title_label = tk.Label(accept_package_frame, text="Accept Package", font=("Arial", 18, "bold"), bg="#263238", fg="#81c784")
+    title_label.grid(row=0, column=0, columnspan=2, pady=20)
+
+    # Sender User ID
+    tk.Label(accept_package_frame, text="Sender User ID:", font=("Arial", 14, "bold"), bg="#263238", fg="#81c784").grid(row=1, column=0, sticky="w", pady=12, padx=15)
+    entry_sender_user_id = tk.Entry(accept_package_frame, font=("Arial", 14), relief=tk.SUNKEN, borderwidth=3, width=25)
+    entry_sender_user_id.grid(row=1, column=1, pady=12, padx=15)
+
+    # Tracking Number
+    tk.Label(accept_package_frame, text="Tracking Number:", font=("Arial", 14, "bold"), bg="#263238", fg="#81c784").grid(row=2, column=0, sticky="w", pady=12, padx=15)
+    entry_tracking_number = tk.Entry(accept_package_frame, font=("Arial", 14), relief=tk.SUNKEN, borderwidth=3, width=25)
+    entry_tracking_number.grid(row=2, column=1, pady=12, padx=15)
+
+    # Accept Button
+    accept_button = tk.Button(accept_package_frame, text="Accept Package", font=("Arial", 14, "bold"), bg="#43a047", fg="white", command=accept, width=18, height=2)
+    accept_button.grid(row=3, column=0, columnspan=2, pady=25)
+
+    # Logout Button
+    logout_button = tk.Button(accept_package_frame, text="Logout", font=("Arial", 14, "bold"), bg="#d32f2f", fg="white", command=logout, width=18, height=2)
+    logout_button.grid(row=4, column=0, columnspan=2, pady=15)
+
+    # Tab 2 - Deliver a Package
+    deliver_package_frame = tk.Frame(notebook, bg="#263238")
+    notebook.add(deliver_package_frame, text="Deliver a Package")
+
+    # Title for the tab
+    title_label = tk.Label(deliver_package_frame, text="Deliver Package", font=("Arial", 18, "bold"), bg="#263238", fg="#81c784")
+    title_label.grid(row=0, column=0, columnspan=2, pady=20)
+
+    # Sender User ID
+    tk.Label(deliver_package_frame, text="Sender User ID:", font=("Arial", 14, "bold"), bg="#263238", fg="#81c784").grid(row=1, column=0, sticky="w", pady=12, padx=15)
+    entry_deliver_sender_user_id = tk.Entry(deliver_package_frame, font=("Arial", 14), relief=tk.SUNKEN, borderwidth=3, width=25)
+    entry_deliver_sender_user_id.grid(row=1, column=1, pady=12, padx=15)
+
+    # Tracking Number
+    tk.Label(deliver_package_frame, text="Tracking Number:", font=("Arial", 14, "bold"), bg="#263238", fg="#81c784").grid(row=2, column=0, sticky="w", pady=12, padx=15)
+    entry_deliver_tracking_number = tk.Entry(deliver_package_frame, font=("Arial", 14), relief=tk.SUNKEN, borderwidth=3, width=25)
+    entry_deliver_tracking_number.grid(row=2, column=1, pady=12, padx=15)
+
+    # Deliver Button
+    deliver_button = tk.Button(deliver_package_frame, text="Deliver Package", font=("Arial", 14, "bold"), bg="#43a047", fg="white", command=deliver, width=18, height=2)
+    deliver_button.grid(row=3, column=0, columnspan=2, pady=25)
+
+    # Logout Button
+    logout_button = tk.Button(deliver_package_frame, text="Logout", font=("Arial", 14, "bold"), bg="#d32f2f", fg="white", command=logout, width=18, height=2)
+    logout_button.grid(row=4, column=0, columnspan=2, pady=15)
+
+    # Run the Tkinter event loop
+    root.mainloop()
+
+
+
+courier_window()
 log_in()
+
 
 
