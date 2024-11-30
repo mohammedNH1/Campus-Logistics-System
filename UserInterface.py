@@ -172,32 +172,6 @@ def sign_up():
     # Run the Tkinter event loop
     root.mainloop()
 
-
-# Login button action
-# def login():
-#     user_id = entry_id.get()
-#     password = entry_password.get()
-#     user_type = user_type_var.get()
-
-#     if not all([user_id, password, user_type]):
-#         messagebox.showwarning("Incomplete Data", "Please fill in all fields!")
-#     else:
-#         messagebox.showinfo("Success", f"Welcome, {user_type}!")
-
-# Toggle switch style update
-
-
-# def login():
-#     user_id = entry_id.get()
-#     password = entry_password.get()
-
-#     if not all([user_id, password]):
-#         messagebox.showwarning("Incomplete Data", "Please fill in all fields!")
-#     else:
-#         messagebox.showinfo("Success", f"Welcome, {user_id}!")
-
-# Create main application window
-
 def log_in():
     # Create main application window
     def check_availablity():
@@ -304,16 +278,17 @@ def OTP():
             messagebox.showerror("Error", "Invalid OTP. Please try again.")
             
 
-    # Countdown function
-    def countdown(time_left):
-        if time_left >= 0:
-            timer_label.config(text=f"Time Left: {time_left}s")
-            root.after(1000, countdown, time_left - 1)  # Update every second
-        else:
-            otp_entry.config(state='disabled')  # Disable OTP entry after time runs out
-            messagebox.showinfo("Time's Up", "OTP has expired. Timer will restart.")
-            otp_entry.config(state='normal')  # Re-enable OTP entry for the next OTP
-            countdown(30)
+    # # Countdown function
+    # def countdown(time_left):
+            
+    #     if time_left >= 0:
+    #         timer_label.config(text=f"Time Left: {time_left}s")
+    #         root.after(1000, countdown, time_left - 1)  # Update every second
+    #     else:
+    #         otp_entry.config(state='disabled')  # Disable OTP entry after time runs out
+    #         messagebox.showinfo("Time's Up", "OTP has expired. Timer will restart.")
+    #         otp_entry.config(state='normal')  # Re-enable OTP entry for the next OTP
+    #         countdown(30)
 
     # Create the main application window
     root = tk.Tk()
@@ -365,8 +340,8 @@ def OTP():
 
 
     # Timer label
-    timer_label = tk.Label(root, text="Time Left: 30s", font=("Arial", 14), bg="#263238", fg="#81c784", relief=tk.SUNKEN)
-    timer_label.place(relx=0.5, rely=0.65, anchor="center")
+    # timer_label = tk.Label(root, text="Time Left: 30s", font=("Arial", 14), bg="#263238", fg="#81c784", relief=tk.SUNKEN)
+    # timer_label.place(relx=0.5, rely=0.65, anchor="center")
 
     # Cancel button action
     def cancel_action():
@@ -384,7 +359,7 @@ def OTP():
     submit_button.grid(row=0, column=1, padx=10, ipadx=20, ipady=5)
     
     # Start the timer countdown
-    root.after(1000, countdown, 30)  # Start with a 30-second countdown
+    #root.after(1000, countdown, 30)  # Start with a 30-second countdown
     
     # Run the Tkinter event loop
     root.mainloop()
@@ -664,7 +639,7 @@ def courier_window():
                 DB.update_status("Delivered" , tracking_number)
                 logging.info(f"package Delivered: tracking number: {tracking_number} Status: Delivered")
                 break
-        print("Error")   
+         
 
     def logout():
         root.destroy()
