@@ -8,8 +8,13 @@ import pyotp
 import qrcode
 from io import BytesIO
 import random
+import logging
+logging.basicConfig(filename='transaction.log',
+filemode='a',
+format='%(asctime)s - %(levelname)s - %(message)s',
+level=logging.INFO)
 user_id = ""
-# Submit button action
+user_name = ""
 def sign_up():
     def login(): 
         root.destroy()
@@ -23,7 +28,10 @@ def sign_up():
         id = entry_id.get()
         password = entry_password.get()
         type = user_type_var.get()
-
+        global user_id 
+        user_id = id
+        global user_name
+        user_name = Fname +" "+ Lname
         valid_phone_number = re.search("^(05)" ,number)
         if type == 'Student':
             valid_ID = len(id) == 10
@@ -281,7 +289,7 @@ def OTP():
     # Function to generate a QR code for Google Authenticator
     def generate_qr_code():
         totp = pyotp.TOTP(secret_key)
-        uri = totp.provisioning_uri(name="user@example.com", issuer_name="OTP Verification App")
+        uri = totp.provisioning_uri(name = user_name +" "+ user_id  , issuer_name ="KSU Logistics")
         qr = qrcode.make(uri)
         return qr
 
@@ -448,12 +456,7 @@ def admin():
     # Run the Tkinter event loop
     admin_root.mainloop()
  
-# User Window
-import logging
-logging.basicConfig(filename='transaction.log',
-filemode='a',
-format='%(asctime)s - %(levelname)s - %(message)s',
-level=logging.DEBUG)
+
 
 def user_window():
     def add_package():
