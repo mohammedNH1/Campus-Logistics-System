@@ -1,110 +1,19 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from User import user
 from DataBase import database 
 import re
 import hashlib
+from PIL import Image, ImageTk
+import pyotp
+import qrcode
+from io import BytesIO
 
 user_id = ""
 # Submit button action
 def sign_up():
-     # Login button action
-   
-    # Toggle switch style update
-    def toggle_switch():
-        selected = user_type_var.get()
-
-        # Check and update the appearance of the toggles based on selection
-        if selected == "Student":
-            toggle_Student.config(bg="#43a047", fg="white", relief="solid")
-            toggle_faculty.config(bg="#263238", fg="white", relief="solid")
-            toggle_Courier.config(bg="#263238", fg="white", relief="solid")
-        elif selected == "Faculty":
-            toggle_faculty.config(bg="#43a047", fg="white", relief="solid")
-            toggle_Student.config(bg="#263238", fg="white", relief="solid")
-            toggle_Courier.config(bg="#263238", fg="white", relief="solid")
-        elif selected == "Courier":
-            toggle_Courier.config(bg="#43a047", fg="white", relief="solid")
-            toggle_Student.config(bg="#263238", fg="white", relief="solid")
-            toggle_faculty.config(bg="#263238", fg="white", relief="solid")
-
-    # Create main application window
-    root = tk.Tk()
-    root.title("Sign Up")  # Changed to "Sign Up"
-    root.geometry("700x700")  # Set window size
-    root.configure(bg="#37474f")  # Set a masculine background color
-
-    # Center window on screen
-    window_width = 700
-    window_height = 700
-    screen_width = root.winfo_screenwidth()
-    screen_height = root.winfo_screenheight()
-
-    position_top = int(screen_height / 2 - window_height / 2)
-    position_left = int(screen_width / 2 - window_width / 2)
-
-    root.geometry(f'{window_width}x{window_height}+{position_left}+{position_top}')
-
-    # Create a frame for form fields with bold, masculine colors
-    frame = tk.Frame(root, bg="#263238", padx=20, pady=20, relief=tk.GROOVE, borderwidth=3)
-    frame.place(relx=0.5, rely=0.5, anchor="center")
-
-    # Form Title
-    title_label = tk.Label(root, text="Sign Up", font=("Arial", 20, "bold"), bg="#37474f", fg="#64b5f6")
-    title_label.place(relx=0.5, rely=0.1, anchor="center")
-
-    # First Name
-    tk.Label(frame, text="First Name:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=0, column=0, sticky="w", pady=10, padx=10)
-    entry_first_name = tk.Entry(frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
-    entry_first_name.grid(row=0, column=1, pady=10, padx=10)
-
-    # Last Name
-    tk.Label(frame, text="Last Name:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=1, column=0, sticky="w", pady=10, padx=10)
-    entry_last_name = tk.Entry(frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
-    entry_last_name.grid(row=1, column=1, pady=10, padx=10)
-
-    # ID
-    tk.Label(frame, text="ID:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=2, column=0, sticky="w", pady=10, padx=10)
-    entry_id = tk.Entry(frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
-    entry_id.grid(row=2, column=1, pady=10, padx=10)
-
-    # Type (Toggle buttons placed next to each other)
-    tk.Label(frame, text="Type:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=3, column=0, sticky="w", pady=10, padx=10)
-    user_type_var = tk.StringVar(value="Student")  # Default to "User"
-
-    # Create a frame to hold the toggle switches
-    toggle_frame = tk.Frame(frame, bg="#263238")
-    toggle_frame.grid(row=3, column=1, pady=10, padx=10)
-
-    # Create the toggle buttons with black borders
-    toggle_Student = tk.Button(toggle_frame, text="Student", font=("Arial", 12), width=12, bg="#43a047", fg="white", relief="solid", borderwidth=2, command=lambda: user_type_var.set("Student"))
-    toggle_faculty = tk.Button(toggle_frame, text="Faculty", font=("Arial", 12), width=12, bg="#263238", fg="white", relief="solid", borderwidth=2, command=lambda: user_type_var.set("Faculty"))
-    toggle_Courier = tk.Button(toggle_frame, text="Courier", font=("Arial", 12), width=12, bg="#263238", fg="white", relief="solid", borderwidth=2, command=lambda: user_type_var.set("Courier"))
-
-    # Position the toggle buttons horizontally
-    toggle_Student.grid(row=0, column=0, padx=10)
-    toggle_faculty.grid(row=0, column=1, padx=10)
-    toggle_Courier.grid(row=0, column=2, padx=10)
-
-    # Password
-    tk.Label(frame, text="Password:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=4, column=0, sticky="w", pady=10, padx=10)
-    entry_password = tk.Entry(frame, font=("Arial", 12), show="*", relief=tk.SUNKEN, borderwidth=2)
-    entry_password.grid(row=4, column=1, pady=10, padx=10)
-
-    # Email
-    tk.Label(frame, text="Email:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=5, column=0, sticky="w", pady=10, padx=10)
-    entry_email = tk.Entry(frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
-    entry_email.grid(row=5, column=1, pady=10, padx=10)
-
-    # Phone Number
-    tk.Label(frame, text="Phone Number:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=6, column=0, sticky="w", pady=10, padx=10)
-    entry_phone_number = tk.Entry(frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
-    entry_phone_number.grid(row=6, column=1, pady=10, padx=10)
-
-    # Buttons
-    def func():
+    def login(): 
         root.destroy()
-        log_in()
+        log_in()  # log_in window
     def input_valid():
         
         Fname = entry_first_name.get()
@@ -117,33 +26,135 @@ def sign_up():
 
         valid_phone_number = re.search("^(05)" ,number)
         if type == 'Student':
-            valid_ID = len(id) == 2
-            #valid_ID = len(id) == 10
+            valid_ID = len(id) == 10
         else:
-            valid_ID = len(id) == 2
-            #valid_ID = len(id) == 6        
-        # valid_pass = len(password) >= 6
-        valid_pass = len(password) == 2
+            valid_ID = len(id) == 6        
+        valid_pass = len(password) >= 6
         valid_email = re.search("(@ksu.edu.sa)$", email)
         if not valid_phone_number:
+             messagebox.showinfo("Phone number invalid", "Number must start with 05")
              print("invalid phone number 05")
-        elif not valid_ID:    
+        elif not valid_ID:
+             if type == "Student":
+                 messagebox.showinfo("ID invalid", "ID must be 10 digits")
+             else:
+                 messagebox.showinfo("ID invalid", "ID must be 6 digits")
              print("invalid digits ID")
         elif not valid_pass:
+             messagebox.showinfo("Password invalid", "password must be atleast 6 digits")
              print("invalid password wrong ")
         elif not valid_email:
+             messagebox.showinfo("Email invalid", "Email must ends with @ksu.edu.sa ")
              print("invalid email")
         else:
-            print("insert worked")
-            myUser = user(id , Fname , Lname , type, email , number , password)
+            password = hashlib.sha256(password.encode()).hexdigest()
+            DB = database()
+            DB.insertUser(id , Fname , Lname , type , email , number , password )
             root.destroy()
-            user_window() # if
+            flag = OTP()     # window
+            if flag:
+                if type == "Courier":
+                    courier_window()
+                else:
+                    user_window()
+
+   
+    # Toggle switch style update
+    def toggle_switch():
+        selected = user_type_var.get()
+
+        # Check and update the appearance of the toggles based on selection
+        if selected == "Student":
+            toggle_Student.config(bg="#43a047", fg="white",)
+            toggle_faculty.config(bg="#263238", fg="white",)
+            toggle_Courier.config(bg="#263238", fg="white",)
+        elif selected == "Faculty":
+            toggle_faculty.config(bg="#43a047", fg="white",)
+            toggle_Student.config(bg="#263238", fg="white",)
+            toggle_Courier.config(bg="#263238", fg="white",)
+        elif selected == "Courier":
+            toggle_Courier.config(bg="#43a047", fg="white",)
+            toggle_Student.config(bg="#263238", fg="white",)
+            toggle_faculty.config(bg="#263238", fg="white",)
+
+    # Create main application window
+    root = tk.Tk()
+    root.title("Sign Up")  # Changed to "Sign Up"
+    root.configure(bg="#37474f")  # Set a masculine background color
+
+    # Center window on screen
+    window_width = 700
+    window_height = 700
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+
+    position_top = int(screen_height / 2 - window_height / 2)
+    position_left = int(screen_width / 2 - window_width / 2)
+
+    root.geometry(f'{window_width}x{window_height}+{position_left}+{position_top - 50}')
+
+    # Create a frame for form fields with bold, masculine colors
+    frame = tk.Frame(root, bg="#263238", padx=20, pady=20, relief=tk.GROOVE, borderwidth=3)
+    frame.place(relx=0.5, rely=0.5, anchor="center")
+
+    # Form Title
+    title_label = tk.Label(root, text="Sign Up", font=("Arial", 20, "bold"), bg="#37474f", fg="#64b5f6")
+    title_label.place(relx=0.5, rely=0.1, anchor="center")
+
+    # First Name
+    tk.Label(frame, text="First Name:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=0, column=0, sticky="w", pady=10, padx=10)
+    entry_first_name = tk.Entry(frame, font=("Arial", 12), borderwidth=2)
+    entry_first_name.grid(row=0, column=1, pady=10, padx=10)
+
+    # Last Name
+    tk.Label(frame, text="Last Name:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=1, column=0, sticky="w", pady=10, padx=10)
+    entry_last_name = tk.Entry(frame, font=("Arial", 12), borderwidth=2)
+    entry_last_name.grid(row=1, column=1, pady=10, padx=10)
+
+    # ID
+    tk.Label(frame, text="ID:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=2, column=0, sticky="w", pady=10, padx=10)
+    entry_id = tk.Entry(frame, font=("Arial", 12),  borderwidth=2)
+    entry_id.grid(row=2, column=1, pady=10, padx=10)
+
+    # Type (Toggle buttons placed next to each other)
+    tk.Label(frame, text="Type:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=3, column=0, sticky="w", pady=10, padx=10)
+    user_type_var = tk.StringVar(value="Student")  # Default to "User"
+
+    # Create a frame to hold the toggle switches
+    toggle_frame = tk.Frame(frame, bg="#263238")
+    toggle_frame.grid(row=3, column=1, pady=10, padx=10)
+
+    # Create the toggle buttons
+    toggle_Student = tk.Button(toggle_frame, text="Student", font=("Arial", 12), width=12, bg="#43a047", fg="white",  borderwidth=2, command=lambda: user_type_var.set("Student"))
+    toggle_faculty = tk.Button(toggle_frame, text="Faculty", font=("Arial", 12), width=12, bg="#263238", fg="white",  borderwidth=2, command=lambda: user_type_var.set("Faculty"))
+    toggle_Courier = tk.Button(toggle_frame, text="Courier", font=("Arial", 12), width=12, bg="#263238", fg="white",  borderwidth=2, command=lambda: user_type_var.set("Courier"))
+
+    # Position the toggle buttons horizontally
+    toggle_Student.grid(row=0, column=0, padx=10)
+    toggle_faculty.grid(row=0, column=1, padx=10)
+    toggle_Courier.grid(row=0, column=2, padx=10)
+
+    # Password
+    tk.Label(frame, text="Password:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=4, column=0, sticky="w", pady=10, padx=10)
+    entry_password = tk.Entry(frame, font=("Arial", 12), show="•",  borderwidth=2)
+    entry_password.grid(row=4, column=1, pady=10, padx=10)
+
+    # Email
+    tk.Label(frame, text="Email:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=5, column=0, sticky="w", pady=10, padx=10)
+    entry_email = tk.Entry(frame, font=("Arial", 12),  borderwidth=2)
+    entry_email.grid(row=5, column=1, pady=10, padx=10)
+
+    # Phone Number
+    tk.Label(frame, text="Phone Number:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=6, column=0, sticky="w", pady=10, padx=10)
+    entry_phone_number = tk.Entry(frame, font=("Arial", 12),  borderwidth=2)
+    entry_phone_number.grid(row=6, column=1, pady=10, padx=10)
+
     button_frame = tk.Frame(root, bg="#37474f")
     button_frame.place(relx=0.5, rely=0.85, anchor="center")  # Adjusted position slightly
     submit_button = tk.Button(button_frame, text="Submit", font=("Arial", 12, "bold"), bg="#43a047", fg="white", command=input_valid)
     submit_button.grid(row=0, column=1, padx=10, ipadx=20, ipady=5)
 
-    login_button = tk.Button(button_frame, text="Login", font=("Arial", 12, "bold"), bg="#0288d1", fg="white", command= func)
+    login_button = tk.Button(button_frame, text="Login", font=("Arial", 12, "bold"), bg="#0288d1", fg="white", command= login)
     login_button.grid(row=0, column=0, padx=10, ipadx=20, ipady=5)
 
     # Update toggle appearance on selection
@@ -153,8 +164,6 @@ def sign_up():
     # Run the Tkinter event loop
     root.mainloop()
 
-import tkinter as tk
-from tkinter import messagebox
 
 # Login button action
 # def login():
@@ -168,8 +177,7 @@ from tkinter import messagebox
 #         messagebox.showinfo("Success", f"Welcome, {user_type}!")
 
 # Toggle switch style update
-import tkinter as tk
-from tkinter import messagebox
+
 
 # def login():
 #     user_id = entry_id.get()
@@ -181,6 +189,7 @@ from tkinter import messagebox
 #         messagebox.showinfo("Success", f"Welcome, {user_id}!")
 
 # Create main application window
+
 def log_in():
     # Create main application window
     def check_availablity():
@@ -193,17 +202,20 @@ def log_in():
             password = hashlib.sha256(password.encode()).hexdigest()
             checkDB = database()
             flag = checkDB.retrieveUser(id , password)
-            if flag == True:
-                global user_id
-                user_id = id
-                user_window()
-                print("It is a user -------> open the user GUI and close login")
-            elif flag == "Courier":
-                print("It is a Courier -------> it is a Courier")
-            elif flag == False:
-                print("It is not in DB")
-            else:
-                print("No option for this")         
+            checkOTP = OTP()
+            if checkOTP:
+                if flag == True:
+
+                    root.destroy()
+                    global user_id
+                    user_id = id
+                    user_window()
+                elif flag == "Courier":
+                    root.destroy()
+                    courier_window()
+                else:
+                    messagebox.showwarning("Error", "ID or password is Wrong")
+               
 
         
     
@@ -262,6 +274,114 @@ def log_in():
 
 
 # Call the login function to start the application
+def OTP():
+    # Generate a secret key for pyotp
+    secret_key = pyotp.random_base32()
+
+    # Function to generate a QR code for Google Authenticator
+    def generate_qr_code():
+        totp = pyotp.TOTP(secret_key)
+        uri = totp.provisioning_uri(name="user@example.com", issuer_name="OTP Verification App")
+        qr = qrcode.make(uri)
+        return qr
+
+    # Function to verify the OTP
+    def submit_otp():
+        otp = otp_entry.get()
+        totp = pyotp.TOTP(secret_key)
+        if totp.verify(otp):  # Verify the OTP
+            messagebox.showinfo("Success", "OTP Verified Successfully!")
+            root.destroy()
+            return True
+        else:
+            messagebox.showerror("Error", "Invalid OTP. Please try again.")
+            
+
+    # Countdown function
+    def countdown(time_left):
+        if time_left >= 0:
+            timer_label.config(text=f"Time Left: {time_left}s")
+            root.after(1000, countdown, time_left - 1)  # Update every second
+        else:
+            otp_entry.config(state='disabled')  # Disable OTP entry after time runs out
+            messagebox.showinfo("Time's Up", "OTP has expired. Timer will restart.")
+            otp_entry.config(state='normal')  # Re-enable OTP entry for the next OTP
+            countdown(30)
+
+    # Create the main application window
+    root = tk.Tk()
+    root.title("OTP Entry with Timer")
+    root.geometry("700x700")
+    root.configure(bg="#37474f")
+
+    # Center the window on the screen
+    window_width = 700
+    window_height = 700
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    position_top = int(screen_height / 2 - window_height / 2)
+    position_left = int(screen_width / 2 - window_width / 2)
+    root.geometry(f'{window_width}x{window_height}+{position_left}+{position_top}')
+
+    # Frame for form fields
+    frame = tk.Frame(root, bg="#263238", padx=20, pady=20, relief=tk.GROOVE, borderwidth=3)
+    frame.place(relx=0.5, rely=0.4, anchor="center")
+
+    # Title label
+    title_label = tk.Label(root, text="OTP Verification", font=("Arial", 20, "bold"), bg="#37474f", fg="#64b5f6")
+    title_label.place(relx=0.5, rely=0.1, anchor="center")
+
+    # OTP entry field
+    otp_label = tk.Label(frame, text="Enter OTP:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784")
+    otp_label.grid(row=0, column=0, sticky="w", pady=10, padx=10)
+
+    otp_entry = tk.Entry(frame, show="*", state='normal', font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
+    otp_entry.grid(row=0, column=1, pady=10, padx=10)
+
+    # Generate and display the QR code
+    qr_code_image = generate_qr_code()
+
+    # Save QR code to a buffer and load it into ImageTk
+    qr_buffer = BytesIO()
+    qr_code_image.save(qr_buffer, format="PNG")
+    qr_buffer.seek(0)
+
+    # Create an ImageTk.PhotoImage object
+    qr_image = ImageTk.PhotoImage(Image.open(qr_buffer).resize((150, 150)))
+
+    # Store the image reference in the root (this will prevent garbage collection)
+    root.qr_image = qr_image
+
+    # Create a Label widget to display the QR code
+    qr_label = tk.Label(frame, image=qr_image, bg="#263238")
+    qr_label.grid(row=2, column=0, columnspan=2, pady=20)
+
+
+    # Timer label
+    timer_label = tk.Label(root, text="Time Left: 30s", font=("Arial", 14), bg="#263238", fg="#81c784", relief=tk.SUNKEN)
+    timer_label.place(relx=0.5, rely=0.65, anchor="center")
+
+    # Cancel button action
+    def cancel_action():
+        root.destroy()
+        log_in()
+
+    # Buttons at the bottom
+    button_frame = tk.Frame(root, bg="#37474f")
+    button_frame.place(relx=0.5, rely=0.9, anchor="center")
+
+    cancel_button = tk.Button(button_frame, text="Cancel", font=("Arial", 12, "bold"), bg="#d32f2f", fg="white", command=cancel_action)
+    cancel_button.grid(row=0, column=0, padx=10, ipadx=20, ipady=5)
+
+    submit_button = tk.Button(button_frame, text="Submit OTP", font=("Arial", 12, "bold"), bg="#43a047", fg="white", command=submit_otp)
+    submit_button.grid(row=0, column=1, padx=10, ipadx=20, ipady=5)
+    
+    # Start the timer countdown
+    root.after(1000, countdown, 30)  # Start with a 30-second countdown
+    
+    # Run the Tkinter event loop
+    root.mainloop()
+    return submit_button
 
 
 def admin():
@@ -740,7 +860,6 @@ def courier_window():
 
 
 
-courier_window()
 log_in()
 
 
