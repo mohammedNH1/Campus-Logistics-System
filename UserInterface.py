@@ -7,7 +7,7 @@ from PIL import Image, ImageTk
 import pyotp
 import qrcode
 from io import BytesIO
-
+import random
 user_id = ""
 # Submit button action
 def sign_up():
@@ -202,24 +202,24 @@ def log_in():
             password = hashlib.sha256(password.encode()).hexdigest()
             checkDB = database()
             flag = checkDB.retrieveUser(id , password)
-            checkOTP = OTP()
-            if checkOTP:
-                if flag == True:
-
-                    root.destroy()
-                    global user_id
-                    user_id = id
+            
+            
+            if flag == True:
+                root.destroy()
+                global user_id
+                user_id = id
+                checkOTP = OTP()
+                if checkOTP:
                     user_window()
-                elif flag == "Courier":
-                    root.destroy()
+                    
+            elif flag == "Courier":
+                root.destroy()
+                checkOTP = OTP()
+                if checkOTP:
                     courier_window()
-                else:
-                    messagebox.showwarning("Error", "ID or password is Wrong")
-               
-
-        
-    
-        
+            else:
+                messagebox.showwarning("Error", "ID or password is Wrong") 
+                     
     root = tk.Tk()
     root.title("Login Page")
     root.geometry("700x500")  # Window size
@@ -290,7 +290,6 @@ def OTP():
         otp = otp_entry.get()
         totp = pyotp.TOTP(secret_key)
         if totp.verify(otp):  # Verify the OTP
-            messagebox.showinfo("Success", "OTP Verified Successfully!")
             root.destroy()
             return True
         else:
@@ -335,7 +334,7 @@ def OTP():
     otp_label = tk.Label(frame, text="Enter OTP:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784")
     otp_label.grid(row=0, column=0, sticky="w", pady=10, padx=10)
 
-    otp_entry = tk.Entry(frame, show="*", state='normal', font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
+    otp_entry = tk.Entry(frame,  state='normal', font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
     otp_entry.grid(row=0, column=1, pady=10, padx=10)
 
     # Generate and display the QR code
@@ -391,35 +390,14 @@ def admin():
         DB = database()
         DB.insertOffice(id , name)
 
-
-
-    def create_logistics_office():
-        office_id = entry_office_id.get()
-        office_name = entry_office_name.get()
-
-        if not office_id or not office_name:
-            messagebox.showwarning("Incomplete Data", "Please fill in all fields!")
-        else:
-            central_database.append({"Office ID": office_id, "Office Name": office_name})
-            messagebox.showinfo("Success", "Logistics office added successfully!")
-
     def logout():
         admin_root.destroy()
         sign_up()
 
     def backup_database():
-        if not central_database:
-            messagebox.showwarning("No Data", "No data to backup!")
-            return
-
-        try:
-            with open("database_backup.csv", "w", newline="") as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=["Office ID", "Office Name"])
-                writer.writeheader()
-                writer.writerows(central_database)
-            messagebox.showinfo("Success", "Backup completed successfully!")
-        except Exception as e:
-            messagebox.showerror("Error", f"Failed to backup data: {str(e)}")
+        DB = database()
+        DB.backup()
+           
 
     # Create admin application window
     admin_root = tk.Tk()
@@ -446,12 +424,12 @@ def admin():
 
     # Logistics Office ID
     tk.Label(frame, text="Office ID:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=0, column=0, sticky="w", pady=10, padx=10)
-    entry_office_id = tk.Entry(frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
+    entry_office_id = tk.Entry(frame, font=("Arial", 12) , borderwidth=2)
     entry_office_id.grid(row=0, column=1, pady=10, padx=10)
 
     # Logistics Office Name
     tk.Label(frame, text="Office Name:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=1, column=0, sticky="w", pady=10, padx=10)
-    entry_office_name = tk.Entry(frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
+    entry_office_name = tk.Entry(frame, font=("Arial", 12), borderwidth=2)
     entry_office_name.grid(row=1, column=1, pady=10, padx=10)
 
     # Buttons
@@ -470,63 +448,13 @@ def admin():
     # Run the Tkinter event loop
     admin_root.mainloop()
  
-    
-#log_in()
-import tkinter as tk
-from tkinter import messagebox
-import random
-import time
-from tkinter import ttk
-
-# Mock function to simulate the database connection and transaction logging
-def log_transaction(user_id, receiver_id, package_details, logistics_office_id):
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    with open("transaction_log.txt", "a") as log_file:
-        log_file.write(f"{timestamp} - Sender: {user_id}, Receiver: {receiver_id}, Package: {package_details}, Logistics Office: {logistics_office_id}\n")
-
-# Mock function to simulate package tracking
-def retrieve_user_packages(user_id):
-    # In a real-world scenario, this would fetch data from a central database
-    return [
-        {"tracking_number": "1234567890123456", "status": "Shipped", "location": "Warehouse A"},
-        {"tracking_number": "2345678901234567", "status": "In Transit", "location": "Logistics Office B"},
-    ]
-
-# Function to generate a random tracking number
-def generate_tracking_number():
-    return ''.join([str(random.randint(0, 9)) for _ in range(16)])
-
-# User Window
-import tkinter as tk
-from tkinter import messagebox
-import random
-import time
-from tkinter import ttk
-
-# Mock function to simulate the database connection and transaction logging
-def log_transaction(user_id, receiver_id, package_details, logistics_office_id):
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-    with open("transaction_log.txt", "a") as log_file:
-        log_file.write(f"{timestamp} - Sender: {user_id}, Receiver: {receiver_id}, Package: {package_details}, Logistics Office: {logistics_office_id}\n")
-
-# Mock function to simulate package tracking
-def retrieve_user_packages(user_id):
-    # In a real-world scenario, this would fetch data from a central database
-    return [
-        {"tracking_number": "1234567890123456", "status": "Shipped", "location": "Warehouse A"},
-        {"tracking_number": "2345678901234567", "status": "In Transit", "location": "Logistics Office B"},
-    ]
-
-# Function to generate a random tracking number
-def generate_tracking_number():
-    return ''.join([str(random.randint(0, 9)) for _ in range(16)])
-
 # User Window
 import logging
 logging.basicConfig(filename='transaction.log',
 filemode='a',
 format='%(asctime)s - %(levelname)s - %(message)s',
 level=logging.DEBUG)
+
 def user_window():
     def add_package():
         DB = database()  
@@ -545,21 +473,9 @@ def user_window():
         
     def logout():
         root.destroy()
-        sign_up()  # Assuming you want to call the sign-up function again on logout
+        log_in()  # Assuming you want to call the sign-up function again on logout
 
-    def drop_package():
-        # Get values from the entry fields and drop the package
-        logistics_office = logistics_office_var.get()
-        dimensions = (entry_length.get(), entry_width.get(), entry_height.get())
-        weight = entry_weight.get()
-        receiver_user_id = entry_receiver_user_id.get()
 
-        if not all([logistics_office, *dimensions, weight, receiver_user_id]):
-            messagebox.showwarning("Incomplete Data", "Please fill in all fields!")
-        else:
-            tracking_number = generate_tracking_number()
-            log_transaction(user_id="User123", receiver_id=receiver_user_id, package_details=(dimensions, weight), logistics_office_id=logistics_office)
-            messagebox.showinfo("Success", f"Package Dropped! Tracking Number: {tracking_number}")
 
     def view_packages():
         DB = database()
@@ -609,12 +525,11 @@ def user_window():
     # Create main application window
     root = tk.Tk()
     root.title("User Window")
-    root.geometry("700x700")
     root.configure(bg="#37474f")
 
     # Center window on screen
     window_width = 800
-    window_height = 800
+    window_height = 633
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
     position_top = int(screen_height / 2 - window_height / 2)
@@ -623,7 +538,7 @@ def user_window():
 
     # Create notebook (tabbed interface)
     notebook = ttk.Notebook(root)
-    notebook.pack(pady=20)
+    notebook.pack(pady=70)
 
     # Tab 1 - Drop a Package
     drop_package_frame = tk.Frame(notebook, bg="#263238")
@@ -649,29 +564,28 @@ def user_window():
     # Package Dimensions (Length, Width, Height)
     tk.Label(drop_package_frame, text="Package Dimensions (L x W x H):", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=1, column=0, sticky="w", pady=10, padx=10)
     
-    # Adjusted Entry Size for smaller width (for dimensions)
-    entry_width_size = 4  # Adjusted to be smaller
+    entry_width_size = 4  
 
-    entry_length = tk.Entry(drop_package_frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2, width=entry_width_size)
+    entry_length = tk.Entry(drop_package_frame, font=("Arial", 12),  borderwidth=2, width=entry_width_size)
     entry_length.grid(row=1, column=1, pady=10, padx=5  ,sticky='w')
     tk.Label(drop_package_frame, text="Length", font=("Arial", 10), bg="#263238", fg="#81c784").grid(row=2, column=1, pady=1 ,padx=2,sticky='w')
 
-    entry_width = tk.Entry(drop_package_frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2, width=entry_width_size)
+    entry_width = tk.Entry(drop_package_frame, font=("Arial", 12), borderwidth=2, width=entry_width_size)
     entry_width.grid(row=1, column=1, pady=10, padx=5  )
     tk.Label(drop_package_frame, text="Width", font=("Arial", 10), bg="#263238", fg="#81c784").grid(row=2, column=1, pady=5 )
 
-    entry_height = tk.Entry(drop_package_frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2, width=entry_width_size)
+    entry_height = tk.Entry(drop_package_frame, font=("Arial", 12),  borderwidth=2, width=entry_width_size)
     entry_height.grid(row=1, column=1, pady=10, padx=5 ,sticky='e') 
     tk.Label(drop_package_frame, text="Height", font=("Arial", 10), bg="#263238", fg="#81c784").grid(row=2, column=1, pady=5 , sticky='e')
 
     # Package Weight
     tk.Label(drop_package_frame, text="Package Weight (kg):", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=3, column=0, sticky="w", pady=10, padx=10)
-    entry_weight = tk.Entry(drop_package_frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
+    entry_weight = tk.Entry(drop_package_frame, font=("Arial", 12),  borderwidth=2)
     entry_weight.grid(row=3, column=1, pady=10, padx=10)
 
     # Receiver User ID
     tk.Label(drop_package_frame, text="Receiver User ID:", font=("Arial", 12, "bold"), bg="#263238", fg="#81c784").grid(row=4, column=0, sticky="w", pady=10, padx=10)
-    entry_receiver_user_id = tk.Entry(drop_package_frame, font=("Arial", 12), relief=tk.SUNKEN, borderwidth=2)
+    entry_receiver_user_id = tk.Entry(drop_package_frame, font=("Arial", 12), borderwidth=2)
     entry_receiver_user_id.grid(row=4, column=1, pady=10, padx=10)
 
     # Buttons: Logout and Confirm (with logout to the left of Confirm)
@@ -726,15 +640,15 @@ def courier_window():
 
     def accept():
         sender = entry_sender_user_id.get()
-        tracking_number = entry_tracking_number.get()  # 0 , 3
+        tracking_number = entry_tracking_number.get()
         DB = database()
         packages = DB.retrievePackages()
         for i in packages:
             if i[0] == tracking_number and i[3] == sender and i[6] == "pending":
                 DB = database()
                 DB.update_status("Accepted" , tracking_number)
+                logging.info(f"package Accepted: tracking number: {tracking_number} Status: Accepted")
                 break
-        print("Error")   
 
     def deliver():
         sender = entry_deliver_sender_user_id.get()
@@ -745,54 +659,22 @@ def courier_window():
             if i[0] == tracking_number and i[3] == sender and i[6] == "Accepted":
                 DB = database()
                 DB.update_status("Delivered" , tracking_number)
+                logging.info(f"package Delivered: tracking number: {tracking_number} Status: Delivered")
                 break
         print("Error")   
 
-    def accept_package():
-        DB = database()
-        sender_user_id = entry_sender_user_id.get()
-        tracking_number = entry_tracking_number.get()
-
-        # Check if both fields are filled
-        if not sender_user_id or not tracking_number:
-            messagebox.showwarning("Incomplete Data", "Please fill in all fields!")
-            return
-        
-        # Simulate the acceptance of the package into the logistics system
-        if DB.acceptPackage(sender_user_id, tracking_number):
-            messagebox.showinfo("Success", f"Package {tracking_number} accepted!")
-        else:
-            messagebox.showerror("Error", "Failed to accept the package. Please check the information.")
-
-    def deliver_package():
-        DB = database()
-        sender_user_id = entry_sender_user_id.get()
-        tracking_number = entry_tracking_number.get()
-
-        # Check if both fields are filled
-        if not sender_user_id or not tracking_number:
-            messagebox.showwarning("Incomplete Data", "Please fill in all fields!")
-            return
-        
-        # Simulate the delivery of the package
-        if DB.deliverPackage(sender_user_id, tracking_number):
-            messagebox.showinfo("Success", f"Package {tracking_number} delivered!")
-        else:
-            messagebox.showerror("Error", "Failed to deliver the package. Please check the information.")
-
     def logout():
         root.destroy()
-        sign_up()  # Assuming sign_up() brings back the sign up window
+        log_in()  # Assuming sign_up() brings back the sign up window
 
     # Create main application window
     root = tk.Tk()
     root.title("Courier Window")
-    root.geometry("800x800")  # Slightly smaller window size
     root.configure(bg="#37474f")
 
     # Center window on screen
     window_width = 800
-    window_height = 800
+    window_height = 633
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
     position_top = int(screen_height / 2 - window_height / 2)
@@ -801,7 +683,7 @@ def courier_window():
 
     # Create notebook (tabbed interface)
     notebook = ttk.Notebook(root)
-    notebook.pack(pady=40)  # Add extra padding to move the entire notebook a bit down
+    notebook.pack(pady=70)  # Add extra padding to move the entire notebook a bit down
 
     # Tab 1 - Accept a Package
     accept_package_frame = tk.Frame(notebook, bg="#263238")
@@ -861,6 +743,3 @@ def courier_window():
 
 
 log_in()
-
-
-

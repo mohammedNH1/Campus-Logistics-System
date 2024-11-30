@@ -1,5 +1,6 @@
 import sqlite3
 import csv
+
 class database:
     def __init__(self):
         self.conn = sqlite3.connect('dataBase.db')
@@ -71,7 +72,6 @@ class database:
                     VALUES (?, ?)'''
             
             conn.execute(query, (id, name))
-            print("inser office worked")
             conn.commit()
             conn.close()
         except:
@@ -85,7 +85,6 @@ class database:
                     VALUES (?, ?, ? , ? , ?, ?, ? )'''
             
             conn.execute(query, (tracking_number, office_id , receiver_id , sender_id , dimensions , weight , status ))
-            print("insert package worked")
             conn.commit()
             conn.close()
     def retrieveOffices(self):
@@ -102,7 +101,7 @@ class database:
         cursor = self.conn.execute("SELECT TRACKING_NUMBER , OFFICE_ID, RECEIVER_ID, SENDER_ID , DIMENSIONS , WEIGHT , STATUS from PACKAGE")  
         main_list = []
         
-        for row in cursor:
+        for row in cursor: 
             current_list = []
             current_list.append(row[0])
             current_list.append(row[1])
@@ -118,15 +117,13 @@ class database:
         return main_list 
     def update_status(self, status ,tracking_number ):
         try:
-            print("I am here")
-            # Use parameterized queries to prevent SQL injection
+           
            
             self.conn.execute("UPDATE PACKAGE SET STATUS = ? WHERE TRACKING_NUMBER = ?", (status , tracking_number))
             self.conn.commit()
         except Exception as e:
             print(f"Error updating status: {e}")
-        # Do not close the connection here if it's used elsewhere in the program.
-    
+                
     def backup(self):
         file = open("backup.csv" , "w" , newline="")
         writer = csv.writer(file)
@@ -152,6 +149,6 @@ class database:
 
  
 
-mohammed = database()
-##mohammed.initiate_database()
-mohammed.backup()
+# mohammed = database()
+# mohammed.initiate_database()
+
