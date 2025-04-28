@@ -19,5 +19,5 @@ How It Works:
 
 Tech Stack:
 -Python
--SQLite (or any other database)
+-SQLite
 -Tkinter (for GUI)
